@@ -2,6 +2,25 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+int usage_error() {
+  return fprintf(stdout, "Usage: file path\n");
+}
+int empty_file(char *path) {
+  return fprintf(stdout, "%s: empty\n", path);
+}
+int assci_file(char *path){
+  return fprintf(stdout, "%s: ASCII text\n", path);
+}
+int data_file(char *path){
+  return fprintf(stdout, "%s: data\n", path);
+}
+int print_error(char *path, int errnum) {
+  return fprintf(stdout, "%s: cannot determine (%s)\n", path, strerror(errnum));
+}
+
 
 int main(int argc, char* argv[]) {
   FILE* file;
@@ -10,8 +29,7 @@ int main(int argc, char* argv[]) {
   
   //only 2 arguments?
   if (argc != 2) {
-    printf("Usage: file path\n");
-    return EXIT_FAILURE;
+    usage_error();
   }
   //does file exist?
   if( access( argv[1], F_OK ) != -1 ) {
@@ -23,16 +41,12 @@ int main(int argc, char* argv[]) {
     //is file empty?
     c = fgetc(file);
     if ( c== EOF) {
-      printf("%s: empty\n", argv[1]);
-      fclose(file);
-      return EXIT_SUCCESS;
+      return empty_file(argv[1]);
     }
 
     //is file not readable? If yes, it means that it exists bot cannot be read
     if (access( argv[1], R_OK) == -1) {
-      printf("%s: cannot determine (Permission denied)\n", argv[1]);
-      fclose(file);
-      return EXIT_SUCCESS;
+      return print_error(argv[1],errno);
     }
 
     while (c != EOF) {
@@ -44,18 +58,13 @@ int main(int argc, char* argv[]) {
     }
     
     if (isASCII == 0) {
-      printf("%s: ASCII text\n", argv[1]);
-      fclose(file);
-      return EXIT_SUCCESS;
+      return assci_file(argv[1]);
     }
     else {
-      printf("%s: data\n", argv[1]);
-      fclose(file);
-      return EXIT_SUCCESS;
+      return data_file(argv[1]);
     }
 
   } else {
-    printf("%s: cannot determine (No such file or directory)\n", argv[1]);
-    return EXIT_FAILURE;
+    return print_error(argv[1],errno);
   }
 }
