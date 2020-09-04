@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   
   //only 2 arguments?
   if (argc != 2) {
-    printf("Argument number is wrong.\n");
+    printf("Usage: file path\n");
     return EXIT_FAILURE;
   }
   //does file exist?
@@ -24,6 +24,13 @@ int main(int argc, char* argv[]) {
     c = fgetc(file);
     if ( c== EOF) {
       printf("%s: empty\n", argv[1]);
+      fclose(file);
+      return EXIT_SUCCESS;
+    }
+
+    //is file not readable? If yes, it means that it exists bot cannot be read
+    if (access( argv[1], R_OK) == -1) {
+      printf("%s: cannot determine (Permission denied)\n", argv[1]);
       fclose(file);
       return EXIT_SUCCESS;
     }
