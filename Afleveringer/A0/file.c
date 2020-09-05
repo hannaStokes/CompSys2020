@@ -1,52 +1,72 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include <stdio.h>  // fprintf, stdout.
+#include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS.
+#include <string.h> // strerror.
+#include <errno.h>  // errno.
+#include <unistd.h> // access().
 
+enum file_type {
+	DATA,
+	EMPTY,
+	ASCII,
+};
+
+const char * const FILE_TYPE_STRINGS[] = {
+	"data",
+	"empty",
+	"ASCII text",
+};
+
+char * path;
+FILE * file;
+
+//prints an error message describing what went wrong when accessing @path
 int print_error(char *path, int errnum) {
-  return fprintf(stdout, "%s: cannot determine (%s)\n", path, strerror(errnum));
+	return fprintf(stdout, "%s cannot determine (%s)\n", 
+			path, strerror(errnum));
 }
 
-int main(int argc, char* argv[]) {
-  FILE* file;
-  char c;
-  
-  //only 2 arguments?
-  if (argc != 2) {
-    return fprintf(stdout, "Usage: file path\n");
-  }
-  //does file exist?
-  if( access( argv[1], F_OK ) != -1 ) {
+//evaluates what type of file is located on @path
+int check_type(FILE *file) {
+	char c = fgetc(file);
+	//if the first char encountered is the end of file marker
+	if(c == EOF) {
+		return EMPTY;
+	} 
+	//iterate through the file, if you encounter something that is not in the 
+	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
+	while(c != EOF) {
+		if (!(((7 <= c) && (c <= 13))
+				|| (c == 27)
+				|| ((32 <= c) && (c <= 126)))) {
+			return DATA;
+		} 
+		c = fgetc(file);
+	}
+	return ASCII;
+}
 
-    //open file
-    file = fopen( argv[1], "r");
-    assert( file != NULL);
-
-    //is file empty?
-    c = fgetc(file);
-    if ( c== EOF) {
-      return fprintf(stdout, "%s: empty\n", argv[1]);
-    }
-
-    //is file not readable? If yes, it means that it exists bot cannot be read
-    if (access( argv[1], R_OK) == -1) {
-      return print_error(argv[1],errno);
-    }
-
-    while (c != EOF) {
-      //is file ASCII?
-      if ( !(((c >= 7) && (c <= 13)) || (c == 27) || ((c >= 32) && (c <= 126)))) {
-        return fprintf(stdout, "%s: data\n", argv[1]);
-      }
-      c = fgetc(file);
-    }
-    
-    return fprintf(stdout, "%s: ASCII text\n", argv[1]);
-    
-
+int main(int argc, char *argv[]) {
+  //check number of arguments
+  //if no arguments, print to stderr
+  if(argc == 1) {
+	  fprintf(stderr, "Usage: file path");
+	  return EXIT_FAILURE;
+  //if number of arguments is not exactly 1, fail
+  } else if(argc!=2) {
+	  return EXIT_FAILURE;
+  //if 1 argument, proceed with the given path
   } else {
-    return print_error(argv[1],errno);
+	  path = argv[1];
+  }
+
+  //check if a file exists on path, if it does, open it and print typecheck string to stdout,
+  //otherwise display error message
+  if(access(path, F_OK) == 0) {
+	  file = fopen(path, "r");
+	  fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[check_type(file)]);
+  } else {
+	  return print_error(path, errno);
   }
 }
+
+
