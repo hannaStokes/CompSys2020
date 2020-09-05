@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
   if(access(path, F_OK) == 0) {
 	  file = fopen(path, "r");
 	  fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[check_type(file)]);
+    return EXIT_SUCCESS;
   } else {
 	  return print_error(path, errno);
   }
