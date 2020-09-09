@@ -11,9 +11,9 @@ int main(int argc, char* argv[]) {
   return EXIT_FAILURE;
   }
   
-  unsigned index = atoi(argv[2]);
-  unsigned value = atoi(argv[1]);
-  unsigned newValue = value & ~(1 << index);
+  int index = atoi(argv[2]);
+  int value = atoi(argv[1]);
+  int newValue = value & ~(1 << index);
   printf("%i", newValue);
   return EXIT_SUCCESS;
   
