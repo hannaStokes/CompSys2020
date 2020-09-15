@@ -21,8 +21,9 @@ FILE * file;
 
 //prints an error message describing what went wrong when accessing @path
 int print_error(char *path, int errnum) {
-	return fprintf(stdout, "%s cannot determine (%s)\n", 
-			path, strerror(errnum));
+	fprintf(stdout, "%s cannot determine (%s)\n", 
+		path, strerror(errnum));
+	return EXIT_SUCCESS;
 }
 
 //evaluates what type of file is located on @path
