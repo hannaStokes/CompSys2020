@@ -43,6 +43,7 @@ int check_type(FILE *file) {
 		} 
 		c = fgetc(file);
 	}
+	fclose(file);
 	return ASCII;
 }
 
