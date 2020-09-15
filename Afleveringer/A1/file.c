@@ -16,6 +16,14 @@ const char * const FILE_TYPE_STRINGS[] = {
 	"ASCII text",
 };
 
+enum ASCII_constraints {
+	bell = 7,
+	carriageReturn = 13,
+	escape = 27,
+	space = 32,
+	equivalencySign = 126,
+};
+
 char * path;
 FILE * file;
 
@@ -36,9 +44,9 @@ int check_type(FILE *file) {
 	//iterate through the file, if you encounter something that is not in the 
 	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
 	while(c != EOF) {
-		if (!(((7 <= c) && (c <= 13))
-				|| (c == 27)
-				|| ((32 <= c) && (c <= 126)))) {
+		if (!(((bell <= c) && (c <= carriageReturn))
+				|| (c == escape)
+				|| ((space <= c) && (c <= equivalencySign)))) {
 			return DATA;
 		} 
 		c = fgetc(file);
