@@ -4,10 +4,20 @@
 #include <errno.h>  // errno.
 #include <unistd.h> // access().
 
+#define UTF8_1B(x) (((~x)&(1<<7))==(1<<7))
+#define UTF8_2B(x) ((x&(3<<6))==(3<<6)) && (((~x)&(1<<5))==(1<<5))
+#define UTF8_3B(x) ((x&(7<<5))==(7<<5)) && (((~x)&(1<<4))==(1<<4))
+#define UTF8_4B(x) ((x&(15<<4))==(15<<4)) && (((~x)&(1<<3))==(1<<3))
+#define UTF8_Extra(x) (((x)&(1<<7))==(1<<7)) && (((~x)&(1<<6))==(1<<6))
+
 enum file_type {
 	DATA,
 	EMPTY,
 	ASCII,
+	ISO8859,
+	UTF8,
+	LittleEdian,
+	BigEdian
 };
 
 const char * const FILE_TYPE_STRINGS[] = {
@@ -49,9 +59,11 @@ int check_type(FILE *file) {
 	} 
 	int notAscii = 0;
 	int notISO = 0;
-	int notUnicode = 0;
-	int notLittleEdian = 0;
-	int notBigEdian = 0;
+	int notUTF8 = 0;
+	/*int notLittleEdian = 0;*/
+	/*int notBigEdian = 0;*/
+
+	int ekstraByte = 0;
 
 	//iterate through the file, if you encounter something that is not in the 
 	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
@@ -64,12 +76,66 @@ int check_type(FILE *file) {
 				notISO = 1;
 			}
 		} 
+		if (UTF8_Extra(c)) {
+			if (ekstraByte == 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte--;
+			}
+		}
+		else if (UTF8_1B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+		}
+		else if (UTF8_2B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte++;
+			}
+		}
+		else if (UTF8_3B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte += 2;
+			}
+		}
+		else if (UTF8_4B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte += 3;
+			}
+		}
+		else {
+			notUTF8 = 1;
+		}
 		
-
 		c = fgetc(file);
 	}
+
 	fclose(file);
+
+	if (!notAscii) {
+		return ASCII;
+	}
+	else if (!notISO) {
+		return ISO8859;
+	}
+	else if (!notUTF8) {
+		return UTF8;
+	}
+	else {
+		return DATA;
+	}
 }
+
 int Max_Length(int str_length, char *str[])
 {
     int longest = 0;
