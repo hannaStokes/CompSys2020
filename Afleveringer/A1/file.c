@@ -72,7 +72,7 @@ int check_type(FILE *file) {
 				|| (c == escape)
 				|| ((space <= c) && (c <= equivalencySign)))) {
 			notAscii = 1;
-			if (!((nonBreakingSpace <= c) && (c <= yWithDiaeresis))){
+			if (!((nonBreakingSpace <= (unsigned char) c) && ((unsigned char) c <= yWithDiaeresis))){
 				notISO = 1;
 			}
 		} 
