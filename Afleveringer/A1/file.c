@@ -14,6 +14,10 @@ const char * const FILE_TYPE_STRINGS[] = {
 	"data",
 	"empty",
 	"ASCII text",
+	"ISO-8859",
+	"UTF-8 Unicode Text",
+	"Little-edian UTF-16 Unicode Text",
+	"Big-edian UTF-16 Unicode Text"
 };
 
 enum ASCII_constraints {
@@ -22,6 +26,8 @@ enum ASCII_constraints {
 	escape = 27,
 	space = 32,
 	equivalencySign = 126,
+	nonBreakingSpace = 160,
+	yWithDiaeresis = 255
 };
 
 char * path;
@@ -41,18 +47,28 @@ int check_type(FILE *file) {
 	if(c == EOF) {
 		return EMPTY;
 	} 
+	int notAscii = 0;
+	int notISO = 0;
+	int notUnicode = 0;
+	int notLittleEdian = 0;
+	int notBigEdian = 0;
+
 	//iterate through the file, if you encounter something that is not in the 
 	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
 	while(c != EOF) {
 		if (!(((bell <= c) && (c <= carriageReturn))
 				|| (c == escape)
 				|| ((space <= c) && (c <= equivalencySign)))) {
-			return DATA;
+			notAscii = 1;
+			if (!((nonBreakingSpace <= c) && (c <= yWithDiaeresis))){
+				notISO = 1;
+			}
 		} 
+		
+
 		c = fgetc(file);
 	}
 	fclose(file);
-	return ASCII;
 }
 int Max_Length(int str_length, char *str[])
 {
