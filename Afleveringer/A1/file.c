@@ -4,14 +4,27 @@
 #include <errno.h>  // errno.
 #include <unistd.h> // access().
 
+#define UTF8_1B(x) (((~x)&(1<<7))==(1<<7))
+#define UTF8_2B(x) ((x&(3<<6))==(3<<6)) && (((~x)&(1<<5))==(1<<5))
+#define UTF8_3B(x) ((x&(7<<5))==(7<<5)) && (((~x)&(1<<4))==(1<<4))
+#define UTF8_4B(x) ((x&(15<<4))==(15<<4)) && (((~x)&(1<<3))==(1<<3))
+#define UTF8_Extra(x) (((x)&(1<<7))==(1<<7)) && (((~x)&(1<<6))==(1<<6))
+
 enum file_type {
 	DATA,
 	EMPTY,
 	ASCII,
+<<<<<<< HEAD
 	ISO8859;
 	UTF8;
 	LITTLE_ENDIAN;
 	BIG_ENDIAN;
+=======
+	ISO8859,
+	UTF8,
+	LittleEdian,
+	BigEdian
+>>>>>>> 335c4b63a0e2e7d50b3131de75044236d5ec13b9
 };
 
 const char * const FILE_TYPE_STRINGS[] = {
@@ -57,6 +70,7 @@ int check_type(FILE *file) {
 	//if the first char encountered is the end of file marker
 	if (c == EOF) {
 		return EMPTY;
+<<<<<<< HEAD
 	}
 
 	//iterate through the file, if you encounter something that is not in the 
@@ -69,6 +83,25 @@ int check_type(FILE *file) {
 			//Check if the file is little-endian UTF-16
 			if ((currentChar == 0xFF) && (nextChar == 0xFE)) {
 				notASCII = 1;
+=======
+	} 
+	int notAscii = 0;
+	int notISO = 0;
+	int notUTF8 = 0;
+	/*int notLittleEdian = 0;*/
+	/*int notBigEdian = 0;*/
+
+	int ekstraByte = 0;
+
+	//iterate through the file, if you encounter something that is not in the 
+	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
+	while(c != EOF) {
+		if (!(((bell <= c) && (c <= carriageReturn))
+				|| (c == escape)
+				|| ((space <= c) && (c <= equivalencySign)))) {
+			notAscii = 1;
+			if (!((nonBreakingSpace <= (unsigned char) c) && ((unsigned char) c <= yWithDiaeresis))){
+>>>>>>> 335c4b63a0e2e7d50b3131de75044236d5ec13b9
 				notISO = 1;
 				notUTF8 = 1;
 				return LITTLE_ENDIAN;
@@ -94,6 +127,7 @@ int check_type(FILE *file) {
 				notASCII = 1;
 			}
 		} 
+<<<<<<< HEAD
 
 		//Have any bytes not been ASCII and have all others been ISO-8859?
 		if ( !(notISO) && notASCII ) {
@@ -138,12 +172,56 @@ int check_type(FILE *file) {
 			}
 		}
 
+=======
+		if (UTF8_Extra(c)) {
+			if (ekstraByte == 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte--;
+			}
+		}
+		else if (UTF8_1B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+		}
+		else if (UTF8_2B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte++;
+			}
+		}
+		else if (UTF8_3B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte += 2;
+			}
+		}
+		else if (UTF8_4B(c)) {
+			if (ekstraByte != 0) {
+				notUTF8 = 1;
+			}
+			else {
+				ekstraByte += 3;
+			}
+		}
+		else {
+			notUTF8 = 1;
+		}
+		
+>>>>>>> 335c4b63a0e2e7d50b3131de75044236d5ec13b9
 		c = fgetc(file);
 
 	}
 
 	fclose(file);
 
+<<<<<<< HEAD
 	// Determine which file type
 	if (notASCII && notISO && notUTF8) {
 		return DATA;
@@ -155,6 +233,20 @@ int check_type(FILE *file) {
 		return ASCII;
 	}
 
+=======
+	if (!notAscii) {
+		return ASCII;
+	}
+	else if (!notISO) {
+		return ISO8859;
+	}
+	else if (!notUTF8) {
+		return UTF8;
+	}
+	else {
+		return DATA;
+	}
+>>>>>>> 335c4b63a0e2e7d50b3131de75044236d5ec13b9
 }
 
 int Max_Length(int str_length, char *str[])
