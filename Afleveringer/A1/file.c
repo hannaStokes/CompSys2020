@@ -5,10 +5,10 @@
 #include <unistd.h> // access().
 
 #define UTF8_1B(x) (((~x)&(1<<7))==(1<<7))
-#define UTF8_2B(x) ((x&(3<<6))==(3<<6)) && (((~x)&(1<<5))==(1<<5))
-#define UTF8_3B(x) ((x&(7<<5))==(7<<5)) && (((~x)&(1<<4))==(1<<4))
-#define UTF8_4B(x) ((x&(15<<4))==(15<<4)) && (((~x)&(1<<3))==(1<<3))
-#define UTF8_Extra(x) (((x)&(1<<7))==(1<<7)) && (((~x)&(1<<6))==(1<<6))
+#define UTF8_2B(x) (((x&(3<<6))==(3<<6)) && (((~x)&(1<<5))==(1<<5)))
+#define UTF8_3B(x) (((x&(7<<5))==(7<<5)) && (((~x)&(1<<4))==(1<<4)))
+#define UTF8_4B(x) (((x&(15<<4))==(15<<4)) && (((~x)&(1<<3))==(1<<3)))
+#define UTF8_CONT(x) ((((x)&(1<<7))==(1<<7)) && (((~x)&(1<<6))==(1<<6)))
 
 enum file_type {
 	DATA,
@@ -95,7 +95,7 @@ int check_type(FILE *file) {
 
 		//Start of UTF-8 check
                 //Check if the byte we are looking at is the UTF-8 data byte in multi-byte represented UTF-8 symbols
-		if (UTF8_Extra(currentChar)) {
+		if (UTF8_CONT(currentChar)) {
 			if (ekstraByte == 0) {
 				notUTF8 = 1;
 			} else {

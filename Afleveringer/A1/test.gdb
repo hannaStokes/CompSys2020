@@ -1,14 +1,14 @@
 start
-    int a = 192;
-    int b = 0x80;
-    int c = 0b110;
+    #int a = 192;
+    #int b = 0x80;
+    #int c = 0b110;
 
-    printf("Hexidecimal representation of 192: %X", a);
-    printf("Binary representation of 192: %b", a);
-    printf("Binary representation of 0X80: %b", b);
-    printf("Decimal representation of 0X80: %i", b);
-    printf("Hexidecimal representation of 0b110: %X", c);
-    printf("Decimal representation of 0b110: %i", c);
+    #printf("Hexidecimal representation of 192: %X", a);
+    #printf("Binary representation of 192: %b", a);
+    #printf("Binary representation of 0X80: %b", b);
+    #printf("Decimal representation of 0X80: %i", b);
+    #printf("Hexidecimal representation of 0b110: %X", c);
+    #printf("Decimal representation of 0b110: %i", c);
 
     #
     p "Some basic tests.." 
