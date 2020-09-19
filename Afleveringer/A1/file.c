@@ -8,6 +8,10 @@ enum file_type {
 	DATA,
 	EMPTY,
 	ASCII,
+	ISO8859;
+	UTF8;
+	LITTLE_ENDIAN;
+	BIG_ENDIAN;
 };
 
 const char * const FILE_TYPE_STRINGS[] = {
@@ -20,7 +24,7 @@ const char * const FILE_TYPE_STRINGS[] = {
 	"Big-edian UTF-16 Unicode Text"
 };
 
-enum ASCII_constraints {
+enum ASCII_Constraints {
 	bell = 7,
 	carriageReturn = 13,
 	escape = 27,
@@ -42,34 +46,117 @@ int print_error(char *path, int errnum, int max_length) {
 
 //evaluates what type of file is located on @path
 int check_type(FILE *file) {
-	char c = fgetc(file);
-	//if the first char encountered is the end of file marker
-	if(c == EOF) {
-		return EMPTY;
-	} 
-	int notAscii = 0;
+
+	char currentChar = fgetc(file);
+	char nextChar = fgetc(file);
+
+	int notASCII = 0;
 	int notISO = 0;
-	int notUnicode = 0;
-	int notLittleEdian = 0;
-	int notBigEdian = 0;
+	int notUTF8 = 0;
+
+	//if the first char encountered is the end of file marker
+	if (c == EOF) {
+		return EMPTY;
+	}
 
 	//iterate through the file, if you encounter something that is not in the 
 	//accepted ranges of ASCII characters, deem the file data, otherwise ASCII
-	while(c != EOF) {
-		if (!(((bell <= c) && (c <= carriageReturn))
-				|| (c == escape)
-				|| ((space <= c) && (c <= equivalencySign)))) {
-			notAscii = 1;
-			if (!((nonBreakingSpace <= c) && (c <= yWithDiaeresis))){
+	while (currentChar != EOF && !(notASCII && notISO && notUTF8)) {
+		
+		//Check if the file is UTF-16
+		if (nextChar != EOF) {
+
+			//Check if the file is little-endian UTF-16
+			if ((currentChar == 0xFF) && (nextChar == 0xFE)) {
+				notASCII = 1;
 				notISO = 1;
+				notUTF8 = 1;
+				return LITTLE_ENDIAN;
+
+			//Check if the file is big-endian UTF-16
+			} else if ((currentChar == 0xFE) && (nextChar == 0xFF)) {
+				notASCII = 1;
+				notISO = 1;
+				notUTF8 = 1;
+				return BIG_ENDIAN;
+
+			} else {
+				file--;
+			}
+		}
+
+		//Have all bytes been ASCII so far?
+		if ( !(notASCII) )  {
+			//Is the current byte not a ASCII?
+			if ( !(((bell <= currentChar) && (currentChar <= carriageReturn))
+				|| (currentChar == escape)
+				|| ((space <= currentChar) && (currentChar <= equivalencySign)))) {
+				notASCII = 1;
 			}
 		} 
-		
+
+		//Have any bytes not been ASCII and have all others been ISO-8859?
+		if ( !(notISO) && notASCII ) {
+			//Is the current byte not a ISO-8859?
+			if ( !((nonBreakingSpace <= currentChar) && (currentChar <= yWithDiaeresis))) {
+				notISO = 1;
+			}
+		}
+
+		//Have any bytes not been ISO-8859 and have all others been UTF8?
+		if (notISO && !(notUTF8)) {
+			//Is the current byte not a UTF-8?
+			if (0b11110000 = (currentChar & (0b11110000))) {
+
+				char followingChar = fgetc(file);
+				for (int i = 0; i < 2; i++) {
+					if ( (followingChar == EOF) || ((0b10000000) != (followingChar & (0b10000000)))) {
+						notUTF8 = 1;
+					}
+					char get = fgetc(file);
+				}
+
+			} else if (0b11100000 != (currentChar & 0b11100000)) {
+				
+				char followingChar = fgetc(file);
+				for (int i = 0; i < 1; i++) {
+					if ( (followingChar == EOF) || ((0b10000000) != (followingChar & (0b10000000)))) {
+						notUTF8 = 1;
+					}
+					char followingChar = fgetc(file);
+				}
+
+			} else if ((0b110000 != (currentChar & 0b110000))) {
+
+				char followingChar = fgetc(file);
+				if ( (followingChar == EOF) && ((0b10000000) != (followingChar & (0b10000000)))) { 
+					notUTF8 = 1;
+				}
+
+			} else {
+				notUTF8 = 1;
+			}
+		}
 
 		c = fgetc(file);
+
 	}
+
 	fclose(file);
+
+	// Determine which file type
+	if (notASCII && notISO && notUTF8) {
+		return DATA;
+	} else if (notASCII && notISO) {
+		return UTF8;
+	} else if (notASCII) {
+		return ISO8859;
+	} else {
+		return ASCII;
+	}
+
 }
+
 int Max_Length(int str_length, char *str[])
 {
     int longest = 0;
@@ -111,9 +198,4 @@ int main(int argc, char *argv[]) {
 		}
 		return EXIT_SUCCESS;
   	}
-  
-
-  //check if a file exists on path, if it does, open it and print typecheck string to stdout,
-  //otherwise display error message
-  
 }
