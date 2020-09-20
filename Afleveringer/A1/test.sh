@@ -58,7 +58,7 @@ printf "Dette ĹĺĻļĽľĿŀŁł er 10 forskellige L'er\n" > test_files/UTF84.
 printf "Dette er test Ŋummer 5 for UTF8, men det kan godt ligne at det er test nummer 85\n" > test_files/UTF85.input
 printf "Dette er ikke et normalt J: Ј\n" > test_files/UTF86.input
 printf "ϵ og δ bruges i matematik\n" > test_files/UTF87.input
-printf "ʬʬʬ.google.com findes ikke\n" > test_files/UTF88.input
+printf "\xF\n" > test_files/UTF88.input
 printf "Dette ˸ er længere oppe end \n:" > test_files/UTF89.input
 printf "ȦȨɨ der fløg en lille bi\n" > test_files/UTF810.input
 printf "Hvorfor skulle man nogensinde bruge ʁ til andet end at teste UTF8?\n" > test_files/UTF811.input
