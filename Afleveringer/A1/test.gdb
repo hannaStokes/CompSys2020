@@ -1,14 +1,4 @@
 start
-    #int a = 192;
-    #int b = 0x80;
-    #int c = 0b110;
-
-    #printf("Hexidecimal representation of 192: %X", a);
-    #printf("Binary representation of 192: %b", a);
-    #printf("Binary representation of 0X80: %b", b);
-    #printf("Decimal representation of 0X80: %i", b);
-    #printf("Hexidecimal representation of 0b110: %X", c);
-    #printf("Decimal representation of 0b110: %i", c);
 
     #
     p "Some basic tests.." 
@@ -50,5 +40,18 @@ start
     p UTF8_4B(128 | 64 | 32 | 16 | 8) == 0 
     #
     p "More student tests.."
+
+    #Hexidecimal representation of 192
+    p /x 192
+    #Binary representation of 192
+    p /t 192
+    #Binary representation of 0x80
+    p /t 0x80
+    #Decimal representation of 0x80
+    p /d 0x80
+    #Hexidecimal representation of 0b110
+    p /x 0b110
+    #Decimal representation of 0b110
+    p /d 0b110
     # TODO: Add more tests here.
 q
