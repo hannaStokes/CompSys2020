@@ -45,9 +45,9 @@ start
     p /x 192
     #Binary representation of 192
     p /t 192
-    #Binary representation of 0X80
+    #Binary representation of 0x80
     p /t 0x80
-    #Decimal representation of 0X80
+    #Decimal representation of 0x80
     p /d 0x80
     #Hexidecimal representation of 0b110
     p /x 0b110

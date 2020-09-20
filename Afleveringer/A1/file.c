@@ -16,8 +16,8 @@ enum file_type {
 	ASCII,
 	ISO8859,
 	UTF8,
-	LITTLE_ENDIAN,
-	BIG_ENDIAN
+	LittleEndian,
+	BigEndian
 };
 
 const char * const FILE_TYPE_STRINGS[] = {
@@ -80,7 +80,7 @@ int check_type(FILE *file) {
 	//Check file byte for byte
 	while(currentChar != EOF) {
 		//Check for symbols not in ASCII intervals provided in assignment text
-		if (!(((bell <= currentChar) && (currentChar <= carriageReturn))
+		if (!(notASCII) && !(((bell <= currentChar) && (currentChar <= carriageReturn))
 				|| (currentChar == escape)
 				|| ((space <= currentChar) && (currentChar <= equivalencySign)))) {
 			//If a conflict is found, the file is not ASCII
@@ -88,14 +88,14 @@ int check_type(FILE *file) {
 		}
 
 		//Check file for symbols breaking the ISO-8859 standard (endpoint omitted, as currentChar <= yWithDiaresis will always be true for a char)
-		if (!((nonBreakingSpace <= (unsigned char) currentChar))){
+		if (!(notISO) && !((nonBreakingSpace <= (unsigned char) currentChar))){
 			//If a conflict is found, the file is not ISO-8859
 			notISO = 1;
 		}
 
 		//Start of UTF-8 check
                 //Check if the byte we are looking at is the UTF-8 data byte in multi-byte represented UTF-8 symbols
-		if (UTF8_CONT(currentChar)) {
+		if (!(notUTF8) && (UTF8_CONT(currentChar))) {
 			if (ekstraByte == 0) {
 				notUTF8 = 1;
 			} else {
