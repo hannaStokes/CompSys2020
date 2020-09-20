@@ -16,8 +16,8 @@ enum file_type {
 	ASCII,
 	ISO8859,
 	UTF8,
-	LittleEndian,
-	BigEndian
+	LITTLEENDIAN,
+	BIGENDIAN
 };
 
 const char * const FILE_TYPE_STRINGS[] = {
@@ -25,9 +25,9 @@ const char * const FILE_TYPE_STRINGS[] = {
 	"empty",
 	"ASCII text",
 	"ISO-8859",
-	"UTF-8 Unicode Text",
-	"Little-endian UTF-16 Unicode Text",
-	"Big-endian UTF-16 Unicode Text"
+	"UTF-8 Unicode text",
+	"Little-endian UTF-16 Unicode text, with no line terminators",
+	"Big-endian UTF-16 Unicode text, with no line terminators"
 };
 
 enum ASCII_Constraints {
@@ -60,19 +60,16 @@ int check_type(FILE *file) {
 	int notISO = 0;
 	int notUTF8 = 0;
 
-	//if the first char encountered is the end of file marker
-	if (currentChar == EOF) {
-		return EMPTY;
+	//...check if the file is little-endian UTF-16
+	if (((unsigned char)currentChar == 0xFF) && ((unsigned char)nextChar == 0xFE)) {
+		return LITTLEENDIAN;
+	} else if (((unsigned char)currentChar == 0xFE) && ((unsigned char)nextChar == 0xFF)) {
+		return BIGENDIAN;
 	}
-	//Unless the file ends after the first byte of data...
-	if (nextChar != EOF) {
 
-		//...check if the file is little-endian UTF-16
-		if (((unsigned char)currentChar == 0xFF) && ((unsigned char)nextChar == 0xFE)) {
-			return LITTLE_ENDIAN;
-	        } else if (((unsigned char)currentChar == 0xFE) && ((unsigned char)nextChar == 0xFF)) {
-			return BIG_ENDIAN;
-		}
+	//if the first char encountered is the end of file marker
+	if (nextChar == EOF) {
+		return EMPTY;
 	}
 
 	int ekstraByte = 0;

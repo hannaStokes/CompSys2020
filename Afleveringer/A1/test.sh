@@ -51,18 +51,18 @@ printf "¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼¼=1/4^22" > test_files/ISO10.in
 printf "Ç bruges eksempelvis i det franske sprog" > test_files/ISO11.input
 printf "ß bruges i det tyske" > test_files/ISO12.input
 
-printf "Længe leve Ȱ" > test_files/UTF8.input
-printf "ĳ er faktisk et tegn for sig selv der består af i og j" > test_files/UTF82.input
-printf "Ĵ har en hat på ligesom HC Andersen" > test_files/UTF83.input
-printf "Dette ĹĺĻļĽľĿŀŁł er 10 forskellige L'er" > test_files/UTF84.input
-printf "Dette er test Ŋummer 5 for UTF8, men det kan godt ligne at det er test nummer 85" > test_files/UTF85.input
-printf "Dette er ikke et normalt J: Ј" > test_files/UTF86.input
-printf "ϵ og δ bruges i matematik" > test_files/UTF87.input
-printf "ʬʬʬ.google.com findes ikke" > test_files/UTF88.input
-printf "Dette ˸ er længere oppe end :" > test_files/UTF89.input
-printf "ȦȨɨ der fløg en lille bi" > test_files/UTF810.input
-printf "Hvorfor skulle man nogensinde bruge ʁ til andet end at teste UTF8?" > test_files/UTF811.input
-printf "ʁʁʁʁʁʁʁʁʁʁʁʁʁʁʁ" > test_files/UTF812.input
+printf "Længe leve Ȱ\n" > test_files/UTF8.input
+printf "ĳ er faktisk et tegn for sig selv der består af i og j\n" > test_files/UTF82.input
+printf "Ĵ har en hat på ligesom HC Andersen\n" > test_files/UTF83.input
+printf "Dette ĹĺĻļĽľĿŀŁł er 10 forskellige L'er\n" > test_files/UTF84.input
+printf "Dette er test Ŋummer 5 for UTF8, men det kan godt ligne at det er test nummer 85\n" > test_files/UTF85.input
+printf "Dette er ikke et normalt J: Ј\n" > test_files/UTF86.input
+printf "ϵ og δ bruges i matematik\n" > test_files/UTF87.input
+printf "ʬʬʬ.google.com findes ikke\n" > test_files/UTF88.input
+printf "Dette ˸ er længere oppe end \n:" > test_files/UTF89.input
+printf "ȦȨɨ der fløg en lille bi\n" > test_files/UTF810.input
+printf "Hvorfor skulle man nogensinde bruge ʁ til andet end at teste UTF8?\n" > test_files/UTF811.input
+printf "ʁʁʁʁʁʁʁʁʁʁʁʁʁʁʁ\n" > test_files/UTF812.input
 
 printf "\xFF\xFE 256 er et højt tal" > test_files/LittleEndian.input
 printf "\xFF\xFE MAMA MIA!" > test_files/LittleEndian2.input
