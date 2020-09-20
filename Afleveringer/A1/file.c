@@ -132,6 +132,7 @@ int check_type(FILE *file) {
 			}
 		} else {
 			fclose(file);
+			return DATA;
 		}
 		
 		//Check next byte
@@ -145,10 +146,8 @@ int check_type(FILE *file) {
 		return ASCII;
 	} else if (!notISO) {
 		return ISO8859;
-	} else if (!notUTF8) {
-		return UTF8;
 	} else {
-		return DATA;
+		return UTF8;
 	}
 }
 
