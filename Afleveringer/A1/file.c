@@ -78,66 +78,67 @@ int check_type(FILE *file) {
 	int ekstraByte = 0;
 
 	//Check file byte for byte
-	while(currentChar != EOF) {
+	while(currentChar != EOF && !((notASCII) && (notISO) && (notUTF8))) {
 		//Check for symbols not in ASCII intervals provided in assignment text
 		if (!(notASCII) && !(((bell <= currentChar) && (currentChar <= carriageReturn))
-				|| (currentChar == escape)
-				|| ((space <= currentChar) && (currentChar <= equivalencySign)))) {
+			|| (currentChar == escape)
+			|| ((space <= currentChar) && (currentChar <= equivalencySign)))) { 
 			//If a conflict is found, the file is not ASCII
 			notASCII = 1;
-		}
 
 		//Check file for symbols breaking the ISO-8859 standard (endpoint omitted, as currentChar <= yWithDiaresis will always be true for a char)
-		if (!(notISO) && !((nonBreakingSpace <= (unsigned char) currentChar))){
+		} else if (!(notISO) && !((nonBreakingSpace <= (unsigned char) currentChar))) {
 			//If a conflict is found, the file is not ISO-8859
 			notISO = 1;
-		}
 
 		//Start of UTF-8 check
-                //Check if the byte we are looking at is the UTF-8 data byte in multi-byte represented UTF-8 symbols
-		if (!(notUTF8) && (UTF8_CONT(currentChar))) {
-			if (ekstraByte == 0) {
-				notUTF8 = 1;
+		} else if (!(notUTF8))  {
+			//Check if the byte we are looking at is the UTF-8 data byte in multi-byte represented UTF-8 symbols
+			if (UTF8_CONT(currentChar)) {
+				if (ekstraByte == 0) {
+					notUTF8 = 1;
+				} else {
+					ekstraByte--;
+				}
+			//Check if the byte we are looking at is the UTF-8 marker for 1-byte UTF-8 symbols
+			} else if (UTF8_1B(currentChar)) {
+				if (ekstraByte != 0) {
+					notUTF8 = 1;
+				}
+			//Check if the byte we are looking at is the UTF-8 marker for 2-byte UTF-8 symbols
+			} else if (UTF8_2B(currentChar)) {
+				if (ekstraByte != 0) {
+					notUTF8 = 1;
+				} else {
+					ekstraByte++;
+				}
+			//Check if the byte we are looking at is the UTF-8 marker for 3-byte UTF-8 symbols
+			} else if (UTF8_3B(currentChar)) {
+				if (ekstraByte != 0) {
+					notUTF8 = 1;
+				} else {
+					ekstraByte += 2;
+				}
+			//Check if the byte we are looking at is the UTF-8 marker for 4-byte UTF-8 symbols
+			} else if (UTF8_4B(currentChar)) {
+				if (ekstraByte != 0) {
+					notUTF8 = 1;
+				} else {
+					ekstraByte += 3;
+				}
+			//If all the above fails, then the file is not UTF-8
 			} else {
-				ekstraByte--;
-			}
-		//Check if the byte we are looking at is the UTF-8 marker for 1-byte UTF-8 symbols
-		} else if (UTF8_1B(currentChar)) {
-			if (ekstraByte != 0) {
 				notUTF8 = 1;
 			}
-		//Check if the byte we are looking at is the UTF-8 marker for 2-byte UTF-8 symbols
-		} else if (UTF8_2B(currentChar)) {
-			if (ekstraByte != 0) {
-				notUTF8 = 1;
-			} else {
-				ekstraByte++;
-			}
-		//Check if the byte we are looking at is the UTF-8 marker for 3-byte UTF-8 symbols
-		} else if (UTF8_3B(currentChar)) {
-			if (ekstraByte != 0) {
-				notUTF8 = 1;
-			} else {
-				ekstraByte += 2;
-			}
-		//Check if the byte we are looking at is the UTF-8 marker for 4-byte UTF-8 symbols
-		} else if (UTF8_4B(currentChar)) {
-			if (ekstraByte != 0) {
-				notUTF8 = 1;
-			} else {
-				ekstraByte += 3;
-			}
-		//If all the above fails, then the file is not UTF-8
 		} else {
-			notUTF8 = 1;
+			fclose(file);
 		}
 		
 		//Check next byte
 		currentChar = nextChar;
 		nextChar = fgetc(file);
-	}
 
-	fclose(file);
+	}
 
 	// Determine which file type
 	if (!notASCII) {
