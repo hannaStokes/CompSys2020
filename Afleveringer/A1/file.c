@@ -95,7 +95,7 @@ int check_type(FILE *file) {
 
 		//Start of UTF-8 check
                 //Check if the byte we are looking at is the UTF-8 data byte in multi-byte represented UTF-8 symbols
-		if (UTF8_CONT(currentChar)) {
+		if (!(notUTF8) && (UTF8_CONT(currentChar))) {
 			if (ekstraByte == 0) {
 				notUTF8 = 1;
 			} else {
