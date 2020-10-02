@@ -12,10 +12,10 @@ set -e
 make
 
 # The command with which you run PRUN: You should likely change this variable
-PRUN="python3 prun.py"
+PRUN="x86prime/bin/prun"
 
 # The command with which you run PRASM: You should likely change this variable
-PRASM="python3 prasm.py"
+PRASM="x86prime/bin/prasm"
 
 TESTLOC=tests
 TESTDIR=test_runs

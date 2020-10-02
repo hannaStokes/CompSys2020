@@ -1,7 +1,0 @@
-test:
-  movq $256, %rdx
-  movq %rdx, (%rsp)
-  movq %rdx, (%rcx)
-  movq %rdx, (%rbx)
-  leaq (%rbx,%rsp,%rcx), %rdi
-  stop

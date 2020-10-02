@@ -1,5 +1,0 @@
-test:
-  movq $256, %rdx
-  movq %rdx, $8(%rsp)
-  movq $8(%rsp), %rdi
-  stop

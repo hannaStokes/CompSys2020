@@ -1,7 +1,0 @@
-     1   : R-V      0 -> a4902a000000               : R--                                                       : R-- 
-     2   : R-V      6 -> a5a9d7ffffff               : R-V  a4  LEAQ i,d                          2a -> reg[9]   : R-- 
-     3   : R-V      c -> b6b0a200000000             : R-V  a5  LEAQ i(s),d                        1 -> reg[a]   : R-V 
-     4   : R-V     13 -> b7c9b10f000000             : R-V  b6  LEAQ i(,z,v),d                     4 -> reg[b]   : R-V 
-     5   : R-V     1a -> 0000                       : R-V  b7  LEAQ i(s,z,v),d                   41 -> reg[c]   : R-V 
-     6   : R-V     1c -> 0000                       : R-V  00  STOP                                             : R-V 
-Done

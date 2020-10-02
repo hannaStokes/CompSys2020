@@ -60,13 +60,13 @@ pipeline_control control_pipeline(fetch_regs* fetch, compute_regs* compute, load
 
     pipeline_control result;
 
-    bool fetch_data_hazard = ;
-    bool compute_data_hazard = ;
-    bool load_store_data_hazard = ;
+    bool fetch_data_hazard = false;
+    bool compute_data_hazard = false;
+    bool load_store_data_hazard = false;
     
     // Decide which pipeline registers to update (accept new instruction at clk boundary)
     result.load_store_runs = !load_store_data_hazard;
-    result.compute_runs = result.load_store_runs && !data_hazard;
+    result.compute_runs = result.load_store_runs && !compute_data_hazard;
     result.fetch_runs = result.compute_runs;
 
     // Decide which instructions to keep/potentially pass on/drop
