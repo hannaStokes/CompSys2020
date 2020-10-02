@@ -1,4 +1,0 @@
-test:
-  movq $256, %rsp
-  leaq (%rsp), %rdi
-  stop
