@@ -1,0 +1,5 @@
+test:
+  movq $256, %rdx
+  movq 8(%rdx), %rsp
+  stop
+

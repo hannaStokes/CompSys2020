@@ -1,0 +1,6 @@
+test:
+  movq $2, %rdx
+  movq $1, %rdi
+  salq %rdx, %rdi
+  stop
+
