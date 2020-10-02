@@ -1,0 +1,6 @@
+     1   : R-V      0 -> 643001000000               : R--                                                       : R-- 
+     2   : R-V      6 -> 646001000000               : R-V  64  MOVQ $i,d                          1 -> reg[3]   : R-- 
+     3   : R-V      c -> 1063                       : R-V  64  MOVQ $i,d                          1 -> reg[6]   : R-V 
+     4   : R-V      e -> 0000                       : R-V  10  ADD  s,d                           2 -> reg[6]   : R-V 
+     5   : R-V     10 -> 0000                       : R-V  00  STOP                                             : R-V 
+Done

@@ -84,7 +84,9 @@ int check_type(FILE *file) {
 			notASCII = 1;
 
 		//Check file for symbols breaking the ISO-8859 standard (endpoint omitted, as currentChar <= yWithDiaresis will always be true for a char)
-		} else if (!(notISO) && !((nonBreakingSpace <= (unsigned char) currentChar))) {
+		} else if (!(notISO) && !((nonBreakingSpace <= (unsigned char) currentChar)) && !(((bell <= currentChar) && (currentChar <= carriageReturn))
+			|| (currentChar == escape)
+			|| ((space <= currentChar) && (currentChar <= equivalencySign)))) {
 			//If a conflict is found, the file is not ISO-8859
 			notISO = 1;
 
@@ -98,7 +100,7 @@ int check_type(FILE *file) {
 					ekstraByte--;
 				}
 			//Check if the byte we are looking at is the UTF-8 marker for 1-byte UTF-8 symbols
-			} else if (UTF8_1B(currentChar)) {
+			} else if (UTF8_1B(currentChar) && currentChar != 0) {
 				if (ekstraByte != 0) {
 					notUTF8 = 1;
 				}

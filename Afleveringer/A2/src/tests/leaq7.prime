@@ -1,0 +1,7 @@
+test:
+  movq $16, %rdx
+  movq %rdx, (%rsp)
+  movq %rdx, (%rcx)
+  movq %rdx, (%rbx)
+  leaq 1(%rbx,%rsp,%rcx), %rdi
+  stop
