@@ -169,7 +169,7 @@ int main(int argc, char* argv[]) {
         val shifter_result = shifter(dp_ctrl.shift_is_left, dp_ctrl.shift_is_signed, reg_out_d, op_b);
         bool condition_met = comparator(alu_ctrl, reg_out_d, op_b);
         events.insn_flow_change_request = (condition_met && dp_ctrl.is_conditional) 
-          | dp_ctrl.is_jmp || dp_ctrl.is_call || dp_ctrl.is_return;
+          || dp_ctrl.is_jmp || dp_ctrl.is_call || dp_ctrl.is_return;
         val compute_result = or5(use_if(dp_ctrl.use_agen, agen_result),
                                  use_if(dp_ctrl.use_next_ip, compute.next_ip.out),
                                  use_if(dp_ctrl.use_shifter, shifter_result),
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
         // Pick a new instruction pointer. By default it's the one after the current one,
         // but if the compute stage requests an insn flow change AND runs in the current cycle,
         // we instead source the next ip from the ip computed by the datapath
-        bool compute_overrides = pipe_ctrl.compute_runs && events.insn_flow_change_request;
+        bool compute_overrides = pipe_ctrl.compute_runs && events.insn_flow_change_request && compute.is_valid.out;
         val selected_ip = or(use_if(compute_overrides, compute_next_ip),
                              use_if(!compute_overrides, next_ip));
 
@@ -259,12 +259,14 @@ int main(int argc, char* argv[]) {
         }
         printf("\n");
 
-        // write back compute result to destination register (goes after pretty printing, since they may signal an error)
-        reg_write(regs, compute.reg_d.out, compute_result, dp_ctrl.reg_wr_enable 
-                  && compute.is_valid.out && pipe_ctrl.compute_runs);
+	// Write back results to registerfile. Has to be in instruction order for trace validation
+	// to work correctly (FIXME for 2021: move validation to be driven by clk instead)
         // write back load result to destination register
         reg_write(regs, load_store.reg_d.out, mem_out, load_store.is_load.out 
                   && load_store.is_valid.out && pipe_ctrl.load_store_runs);
+        // write back compute result to destination register (goes after pretty printing, since they may signal an error)
+        reg_write(regs, compute.reg_d.out, compute_result, dp_ctrl.reg_wr_enable 
+                  && compute.is_valid.out && pipe_ctrl.compute_runs);
         memory_clk(mem);
 
         fetch_clk(&fetch);

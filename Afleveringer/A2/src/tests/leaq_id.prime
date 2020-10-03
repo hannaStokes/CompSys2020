@@ -1,6 +1,3 @@
 test:
-  movq $16, %rdx
-  movq %rdx, %rsp
-  movq %rdx, %rcx
   leaq 1, %rdi
   stop

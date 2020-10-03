@@ -1,4 +1,4 @@
 test:
-  movq $256, %rsp
-  leaq (%rsp), %rdi
+  movq $256, %rcx
+  leaq (%rcx), %rdi
   stop

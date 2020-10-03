@@ -1,6 +1,6 @@
      1   : R-V      0 -> 643000010000               : R--                                                       : R-- 
-     2   : R-V      6 -> 2173                       : R-V  64  MOVQ $i,d                        100 -> reg[3]   : R-- 
-     3   : R-V      8 -> a56701000000               : R-V  21  MOVQ s,d                         100 -> reg[7]   : R-V 
+     2   : R-V      6 -> 2123                       : R-V  64  MOVQ $i,d                        100 -> reg[3]   : R-- 
+     3   : R-V      8 -> a56201000000               : R-V  21  MOVQ s,d                         100 -> reg[2]   : R-V 
      4   : R-V      e -> 0000                       : R-V  a5  LEAQ i(s),d                      101 -> reg[6]   : R-V 
      5   : R-V     10 -> 0000                       : R-V  00  STOP                                             : R-V 
 Done

@@ -60,29 +60,18 @@ pipeline_control control_pipeline(fetch_regs* fetch, compute_regs* compute, load
 
     pipeline_control result;
 
-<<<<<<< HEAD
-    bool fetch_stall = events->insn_flow_change_request;
-    bool compute_data_hazard = ((is((load_store->reg_d.in).val,compute->reg_s.in) || is((load_store->reg_d.in).val,compute->reg_z.in) || is((load_store->reg_d.in).val,compute->reg_d.in)) && load_store->is_load.in) 
-    || ((is((load_store->value.in).val,compute->reg_s.in) || is((load_store->value.in).val,compute->reg_z.in) || is((load_store->value.in).val,compute->reg_d.in)) 
-      && load_store->is_store.in) || !events->data_access_ok;
+    bool compute_data_hazard = (same(load_store->reg_d.out,compute->reg_s.out) 
+                                || same(load_store->reg_d.out,compute->reg_z.out) 
+                                || same(load_store->reg_d.out,compute->reg_d.out)) 
+                                && load_store->is_load.out;
     
     // Decide which pipeline registers to update (accept new instruction at clk boundary)
     result.load_store_runs = true;
     result.compute_runs = result.load_store_runs && !compute_data_hazard;
-    result.fetch_runs = result.compute_runs && !fetch_stall;
-=======
-    bool fetch_data_hazard = false;
-    bool compute_data_hazard = false;
-    bool load_store_data_hazard = false;
-    
-    // Decide which pipeline registers to update (accept new instruction at clk boundary)
-    result.load_store_runs = !load_store_data_hazard;
-    result.compute_runs = result.load_store_runs && !compute_data_hazard;
     result.fetch_runs = result.compute_runs;
->>>>>>> 01d812789189caf3d90f2c5413ba513a0b953296
 
     // Decide which instructions to keep/potentially pass on/drop
-    result.fetch_valid = true;
+    result.fetch_valid = !events->insn_flow_change_request && result.fetch_runs;
     compute->is_valid.in = result.fetch_valid;
     load_store->is_valid.in = compute->is_valid.out;
 

@@ -1,5 +1,4 @@
 test:
-  movq $16, %rsp
-  movq $16, %rcx
-  leaq (,%rsp,4), %rdi
+  movq $16, %rbx
+  leaq (,%rbx,4), %rdi
   stop
