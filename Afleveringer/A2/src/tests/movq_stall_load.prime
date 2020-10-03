@@ -1,6 +1,6 @@
 test:
   movq $256, %rdx
-  movq (%rdx), %rcx
-  addq %rcx, %rdx
+  movq (%rdx), %rsp
+  addq %rsp, %rdx
   stop
 
