@@ -1,3 +1,6 @@
 .DS_Store
 Afleveringer/*/test_files
-/Documents/Bsc. Datalogi/CompSys/CompSys2020/Afleveringer/A2/src/x86prime
+Afleveringer/A2/src/sim
+Afleveringer/A2/src/test_runs
+Afleveringer/A2/src/x86prime
+Afleveringer/A2/src/x86prime/*
