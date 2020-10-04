@@ -1,6 +1,4 @@
-     1   : R-V      0 -> 4f0008000000               : R--                                                       : R-- 
-     2   : R--      6 -> 0000                       : R-V  4f  JMP   s,d,p                                      : R-- 
-     3   : R-V      8 -> 507008000000               : R--                                                       : R-V 
-     4   : R-V      e -> 0000                       : R-V  50  ADD  $i,d                          8 -> reg[7]   : R-- 
-     5   : R-V     10 -> 0000                       : R-V  00  STOP                                             : R-V 
-Done
+     1   : R-V      0 -> 513000010000               : R--                                                       : R-- 
+     2   : R-V      6 -> 513008000000               : R-V  51  SUB  $i,d           ffffffffffffff00 -> reg[3]   : R-- 
+ -- value mismatch, access 'R' 3
+ -- with value ffffffffffffff00, but tracefile expected 100
