@@ -1,8 +1,6 @@
-     1   : R-V      0 -> 573001000000               : R--                                                       : R-- 
-     2   : R-V      6 -> 573008000000               : R-V  57  SAL  $i,d                          0 -> reg[3]   : R-- 
-     3   : R-V      c -> 1773                       : R-V  57  SAL  $i,d                          0 -> reg[3]   : R-V 
-     4   : R-V      e -> 1733                       : R-V  17  SAL  s,d                           0 -> reg[7]   : R-V 
-     5   : R-V     10 -> 577000000000               : R-V  17  SAL  s,d                           0 -> reg[3]   : R-V 
-     6   : R-V     16 -> 0000                       : R-V  57  SAL  $i,d                          0 -> reg[7]   : R-V 
-     7   : R-V     18 -> 0000                       : R-V  00  STOP                                             : R-V 
+     1   : R-V      0 -> 643002000000               : R--                                                       : R-- 
+     2   : R-V      6 -> 646001000000               : R-V  64  MOVQ $i,d                          2 -> reg[3]   : R-- 
+     3   : R-V      c -> 1863                       : R-V  64  MOVQ $i,d                          1 -> reg[6]   : R-V 
+     4   : R-V      e -> 0000                       : R-V  18  SHR  s,d                           0 -> reg[6]   : R-V 
+     5   : R-V     10 -> 0000                       : R-V  00  STOP                                             : R-V 
 Done

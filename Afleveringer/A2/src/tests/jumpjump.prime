@@ -7,3 +7,4 @@ test:
     stop
 .test3:
     addq $5, %rdx
+    stop
