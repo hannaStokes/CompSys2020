@@ -66,9 +66,9 @@ pipeline_control control_pipeline(fetch_regs* fetch, compute_regs* compute, load
                                 && load_store->is_load.out;
     
     // Decide which pipeline registers to update (accept new instruction at clk boundary)
-    result.load_store_runs = true;
+    result.load_store_runs = events->data_access_ok;
     result.compute_runs = result.load_store_runs && !compute_data_hazard;
-    result.fetch_runs = result.compute_runs;
+    result.fetch_runs = result.compute_runs && events->insn_access_ok;
 
     // Decide which instructions to keep/potentially pass on/drop
     result.fetch_valid = !events->insn_flow_change_request && result.fetch_runs;
