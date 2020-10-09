@@ -59,12 +59,13 @@ pipeline_control control_pipeline(fetch_regs* fetch, compute_regs* compute, load
                                   selected_events* events) {
 
     pipeline_control result;
-    //needs to determine if ifcr is valid
-    bool is_flow_change_request_valid = events->insn_flow_change_request 
-	                                && compute->is_valid.out; 
+    //There is a data hazard if destination of current memory operation == source of current compute operation, or...
     bool compute_data_hazard = (same(load_store->reg_d.out,compute->reg_s.out) 
+		                //...destination of current memory operation == scalar of current compute operation, or...
                                 || same(load_store->reg_d.out,compute->reg_z.out) 
+		                //...destination of current memory operation == destination of current compute operation...
                                 || same(load_store->reg_d.out,compute->reg_d.out)) 
+	                        //...and the machine has been told that something needs to be loaded
                                 && load_store->is_load.out;
     
     // Decide which pipeline registers to update (accept new instruction at clk boundary)
