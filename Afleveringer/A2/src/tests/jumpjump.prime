@@ -1,0 +1,10 @@
+test:
+    jmp .test2
+    jmp .test3
+    stop
+.test2:
+    addq $8, %rsp
+    stop
+.test3:
+    addq $5, %rsp
+    stop
