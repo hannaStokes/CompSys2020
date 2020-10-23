@@ -1,3 +1,0 @@
-test:
-  leaq 1, %rdi
-  stop

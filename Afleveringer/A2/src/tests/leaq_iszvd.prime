@@ -1,6 +1,0 @@
-test:
-  movq $16, %rdx
-  movq %rdx, %rcx
-  movq %rdx, %rbx
-  leaq 1(%rbx,%rcx,4), %rdi
-  stop

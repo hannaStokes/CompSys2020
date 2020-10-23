@@ -1,5 +1,0 @@
-test:
-  movq %rdx, %rcx
-  movq %rdx, %rbx
-  leaq (%rbx,%rcx,4), %rdi
-  stop

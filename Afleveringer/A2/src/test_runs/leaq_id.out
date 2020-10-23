@@ -1,4 +1,0 @@
-     1   : R-V      0 -> a46001000000               : R--                                                       : R-- 
-     2   : R-V      6 -> 0000                       : R-V  a4  LEAQ i,d                           1 -> reg[6]   : R-- 
-     3   : R-V      8 -> 0000                       : R-V  00  STOP                                             : R-V 
-Done

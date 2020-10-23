@@ -1,7 +1,0 @@
-test:
-    movq $5, %r10
-    cbae $4, %r10, .L1
-.L2:
-    stop
-.L1:
-    stop

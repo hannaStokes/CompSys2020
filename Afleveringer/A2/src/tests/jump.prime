@@ -1,7 +1,0 @@
-test:
-    jmp .test2
-    stop
-.test2:
-    addq $8, %rsp
-    stop
-

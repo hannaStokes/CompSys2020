@@ -1,6 +1,0 @@
-test:
-  movq $2, %rdx
-  movq $1, %rdi
-  orq %rdx, %rdi
-  stop
-

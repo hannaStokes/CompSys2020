@@ -1,4 +1,0 @@
-test:
-  movq $256, %rcx
-  leaq (%rcx), %rdi
-  stop
