@@ -40,14 +40,83 @@ typedef struct cache* cache_p;
 // search it's entries to determine if there is a hit or not.
 // In case of a hit it should also update dirty bit and access counter supporting LRU
 bool cache_access(cache_p cache, uint64_t addr, bool is_write) {
-    // FIXME - implement for A3
+
+    //Masking to pick out values
+    uint64_t set_index = (addr >> 3) & (63);
+    uint64_t tag = (addr >> (6+6));
+
+    cache-> access_counter += 1;
+
+    //Is the cache access a hit or a miss?
+    for (int i = 0; i < ASSOCIATIVITY; i++) {
+        if (cache-> sets[set_index].tags[i] == tag
+        && cache-> sets[set_index].valid[i]) {
+
+            //Dirty update
+            if (is_write) {
+                cache-> sets[set_index].dirty[i] = true;
+            }
+
+            //Last access update
+            cache-> sets[set_index].last_access[i] = cache -> access_counter;
+
+            return true;
+        }
+    }
+
+    return false;
+
 }
 
 // Update cache reflecting a cache miss. Returns true if a dirty line needs to
 // be replaced, false otherwise. Find (according to LRU) and initialize a cache 
 // entry to indicate that the requested data is now stored there.
 bool cache_miss_update(cache_p cache, uint64_t addr) {
-    // FIXME - implement for A3
+    
+    //Masking to pick out values
+    uint64_t set_index = (addr >> 3) & (63);
+    uint64_t tag = (addr >> (6+6));
+
+    int LRU = cache-> sets[set_index].last_access[0];
+    int LRU_placement = 0;
+    bool dirty = false;
+    int all_valid = 0;
+
+    //Check and see if all blocks in the set are full
+    for (int i = 0; i < ASSOCIATIVITY; i++) {
+        if (cache-> sets[set_index].valid[i]) {
+            all_valid += 1;
+        }
+    }
+
+    //Find LRU block
+    if (all_valid == 4) {
+        for (int i = 1; i < ASSOCIATIVITY; i++) {
+            if (LRU < cache-> sets[set_index].last_access[i]) {
+                LRU = cache-> sets[set_index].last_access[i];
+                LRU_placement = i;
+            }
+        }
+
+        //Check if LRU is dirty
+        if (cache-> sets[set_index].dirty[LRU_placement]) {
+            dirty = true;
+        }
+
+        //Initialize a cache entry
+        cache-> sets[set_index].tags[LRU_placement] = cache-> sets[set_index].tags[tag];
+        cache-> sets[set_index].valid[LRU_placement] = true;
+        cache-> sets[set_index].dirty[LRU_placement] = false;
+        cache-> sets[set_index].last_access[LRU_placement] = cache -> access_counter;
+
+    }
+
+    if (dirty) {
+        return true;
+    }
+
+    return false;
+
 }
 
 // NO CHANGES NEEDED BELOW THIS LINE
