@@ -42,7 +42,7 @@ typedef struct cache* cache_p;
 bool cache_access(cache_p cache, uint64_t addr, bool is_write) {
 
     //Masking to pick out values
-    uint64_t set_index = (addr >> 3) & (63);
+    uint64_t set_index = (addr >> 6) & (63);
     uint64_t tag = (addr >> (6+6));
 
     cache-> access_counter += 1;
@@ -50,7 +50,7 @@ bool cache_access(cache_p cache, uint64_t addr, bool is_write) {
     //Is the cache access a hit or a miss?
     for (int i = 0; i < ASSOCIATIVITY; i++) {
         if (cache-> sets[set_index].tags[i] == tag
-        && cache-> sets[set_index].valid[i]) {
+         && cache-> sets[set_index].valid[i]) {
 
             //Dirty update
             if (is_write) {
@@ -74,49 +74,54 @@ bool cache_access(cache_p cache, uint64_t addr, bool is_write) {
 bool cache_miss_update(cache_p cache, uint64_t addr) {
     
     //Masking to pick out values
-    uint64_t set_index = (addr >> 3) & (63);
+    uint64_t set_index = (addr >> 6) & (63);
     uint64_t tag = (addr >> (6+6));
 
     int LRU = cache-> sets[set_index].last_access[0];
     int LRU_placement = 0;
-    bool dirty = false;
-    int all_valid = 0;
+    bool replace_dirty = false;
+    bool all_valid = true;
 
-    //Check and see if all blocks in the set are full
+    //Check and see if all blocks in the set are occupied
     for (int i = 0; i < ASSOCIATIVITY; i++) {
-        if (cache-> sets[set_index].valid[i]) {
-            all_valid += 1;
+        if (!cache->sets[set_index].valid[i]) {
+            all_valid = false;
         }
     }
 
-    //Find LRU block
-    if (all_valid == 4) {
+    if (all_valid) {
+	//Find LRU block
         for (int i = 1; i < ASSOCIATIVITY; i++) {
-            if (LRU < cache-> sets[set_index].last_access[i]) {
-                LRU = cache-> sets[set_index].last_access[i];
+            if (LRU < cache->sets[set_index].last_access[i]) {
+                LRU = cache->sets[set_index].last_access[i];
                 LRU_placement = i;
             }
         }
 
         //Check if LRU is dirty
-        if (cache-> sets[set_index].dirty[LRU_placement]) {
-            dirty = true;
+        if (cache->sets[set_index].dirty[LRU_placement]) {
+            replace_dirty = true;
         }
 
         //Initialize a cache entry
-        cache-> sets[set_index].tags[LRU_placement] = cache-> sets[set_index].tags[tag];
-        cache-> sets[set_index].valid[LRU_placement] = true;
-        cache-> sets[set_index].dirty[LRU_placement] = false;
-        cache-> sets[set_index].last_access[LRU_placement] = cache -> access_counter;
-
+        cache->sets[set_index].tags[LRU_placement] = tag;
+        cache->sets[set_index].valid[LRU_placement] = true;
+        cache->sets[set_index].dirty[LRU_placement] = false;
+        cache->sets[set_index].last_access[LRU_placement] = cache -> access_counter;
+    } 
+    else {
+	for(int i = 0; i <ASSOCIATIVITY; i++) {
+	    if(!cache->sets[set_index].valid[i]) {
+		cache->sets[set_index].tags[i] = tag;
+		cache->sets[set_index].valid[i] = true;
+		cache->sets[set_index].dirty[i] = false;
+		cache->sets[set_index].last_access[i] = cache->access_counter;
+		break;
+	    }
+	}
     }
 
-    if (dirty) {
-        return true;
-    }
-
-    return false;
-
+    return replace_dirty;
 }
 
 // NO CHANGES NEEDED BELOW THIS LINE
