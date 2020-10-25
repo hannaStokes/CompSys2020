@@ -1,5 +1,7 @@
 test:
 	jmp	slut
-        movq    $1,%r12
+    movq    $1, %r12
 slut:
+	addq $350, %rdi
+	movq $rdi, (%rdi)
 	stop

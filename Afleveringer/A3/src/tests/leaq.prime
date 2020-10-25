@@ -1,6 +1,6 @@
 test:
   movq $256, %rdx
-  movq $900, %rsp
+  movq $300, %rsp
   movq %rdx, (%rsp)
-  movq (%rsp), %rdi
+  leaq (%rsp), %rdi
   stop

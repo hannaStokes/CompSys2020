@@ -1,0 +1,11 @@
+test:
+  movq $256, %rdx
+  movq $256, %rsp
+  movq %rdx, (%rsp)
+  addq $600, %rdx
+  movq %rdx, (%rsp)
+  movq (%rsp), %rcx
+  addq $400, %rcx
+  movq %rcx, (%rsp)
+  movq (%rsp), %rdi
+  stop

@@ -1,0 +1,15 @@
+test:
+	movq $1, %rdx
+	movq $26624, %rsi
+	movq %rdx, (%rsi)
+	movq $30720, %rsi
+	movq %rdx, (%rsi)
+	movq $22528, %rsi
+	movq %rdx, (%rsi)
+	movq $18432, %rsi
+	movq %rdx, (%rsi)
+	movq $14336, %rsi
+	movq %rdx, (%rsi)
+	movq $26624, %rsi
+	movq (%rsi), %rdx
+	stop

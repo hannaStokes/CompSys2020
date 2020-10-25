@@ -1,0 +1,4 @@
+test:
+	movq $4, %rdi
+	addq $1, %rdi
+	stop

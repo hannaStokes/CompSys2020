@@ -1,0 +1,6 @@
+test:
+	movq $450, %rsi
+	movq $800, %rdi
+	movq (%rsi), %rsi
+	movq %rsi, (%rdi)
+	stop
