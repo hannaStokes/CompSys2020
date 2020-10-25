@@ -1,0 +1,5 @@
+test:
+	jmp	slut
+        movq    $1,%r12
+slut:
+	stop

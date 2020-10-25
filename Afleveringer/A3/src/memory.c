@@ -80,49 +80,41 @@ bool cache_miss_update(cache_p cache, uint64_t addr) {
     int LRU = cache-> sets[set_index].last_access[0];
     int LRU_placement = 0;
     bool replace_dirty = false;
-    bool all_valid = true;
 
-    //Check and see if all blocks in the set are occupied
-    for (int i = 0; i < ASSOCIATIVITY; i++) {
-        if (!cache->sets[set_index].valid[i]) {
-            all_valid = false;
-        }
-    }
-
-    if (all_valid) {
-	//Find LRU block
-        for (int i = 1; i < ASSOCIATIVITY; i++) {
-            if (LRU < cache->sets[set_index].last_access[i]) {
-                LRU = cache->sets[set_index].last_access[i];
-                LRU_placement = i;
-            }
-        }
-
-        //Check if LRU is dirty
-        if (cache->sets[set_index].dirty[LRU_placement]) {
-            replace_dirty = true;
-        }
-
-        //Initialize a cache entry
-        cache->sets[set_index].tags[LRU_placement] = tag;
-        cache->sets[set_index].valid[LRU_placement] = true;
-        cache->sets[set_index].dirty[LRU_placement] = false;
-        cache->sets[set_index].last_access[LRU_placement] = cache -> access_counter;
-    } 
-    else {
-	for(int i = 0; i <ASSOCIATIVITY; i++) {
+    for(int i = 0; i <ASSOCIATIVITY; i++) {
 	    if(!cache->sets[set_index].valid[i]) {
-		cache->sets[set_index].tags[i] = tag;
-		cache->sets[set_index].valid[i] = true;
-		cache->sets[set_index].dirty[i] = false;
-		cache->sets[set_index].last_access[i] = cache->access_counter;
-		break;
-	    }
-	}
+		    cache->sets[set_index].tags[i] = tag;
+		    cache->sets[set_index].valid[i] = true;
+		    cache->sets[set_index].dirty[i] = false;
+		    cache->sets[set_index].last_access[i] = cache->access_counter;
+		    return false;
+        }
     }
 
-    return replace_dirty;
-}
+	
+
+	//Find LRU block
+    for (int i = 1; i < ASSOCIATIVITY; i++) {
+        if (LRU < cache->sets[set_index].last_access[i]) {
+            LRU = cache->sets[set_index].last_access[i];
+            LRU_placement = i;
+        }
+    }
+
+    //Initialize a cache entry
+    cache->sets[set_index].tags[LRU_placement] = tag;
+    cache->sets[set_index].valid[LRU_placement] = true;
+    cache->sets[set_index].dirty[LRU_placement] = false;
+    cache->sets[set_index].last_access[LRU_placement] = cache -> access_counter;
+
+    //Check if LRU is dirty
+    if (cache->sets[set_index].dirty[LRU_placement]) {
+        return true;
+    }
+
+    return false;
+} 
+
 
 // NO CHANGES NEEDED BELOW THIS LINE
 
