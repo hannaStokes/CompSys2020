@@ -25,6 +25,10 @@
 #define PIPELINE_H
 
 #include <stdio.h>
+#include <unistd.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* We treat streams as an opaque type named 'stream'.  All interface
    functions will return and accept pointers to 'stream'. */
