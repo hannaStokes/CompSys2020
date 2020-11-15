@@ -1,6 +1,7 @@
 #include "transducers.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <assert.h>
 
 struct stream {
   int has_reader;
@@ -121,18 +122,82 @@ int transducers_link_1(stream **out,
 int transducers_link_2(stream **out,
                        transducers_2 t, const void *arg,
                        stream* in1, stream* in2) {
-  out=out; /* unused */
-  t=t; /* unused */
-  arg=arg; /* unused */
-  in1=in1; /* unused */
-  in2=in2; /* unused */
-  return 1;
+  
+  if(in1->has_reader != 0
+     && in2->has_reader != 0) {
+    return 1;
+  }
+
+  in1->has_reader = 1;
+  in2->has_reader = 1;
+
+  *out = malloc(sizeof(struct stream));
+  //if memory allocation failed return with error
+  if(*out == 0) {
+    return 1;
+  }
+
+  stream *work = *out;
+  work->has_reader = 0;
+  pipe_wrapper(work->read_write);
+
+  FILE *in1_read_end = in1->read_write[0];
+  FILE *in2_read_end = in2->read_write[0];
+  FILE *out_write_end = work->read_write[1];
+
+  if(fork() == 0) {
+    (*t)(arg, out_write_end, in1_read_end, in2_read_end);
+    fclose(in1_read_end);
+    fclose(in2_read_end);
+    fclose(out_write_end);
+    exit(0);
+  }
+
+  fclose(out_write_end);
+  return 0;
+
 }
 
 int transducers_dup(stream **out1, stream **out2,
                     stream *in) {
-  out1=out1; /* unused */
-  out2=out2; /* unused */
-  in=in; /* unused */
-  return 1;
+  
+  if(in->has_reader != 0) {
+    return 1;
+  }
+
+  in->has_reader = 1;
+
+  *out1 = malloc(sizeof(struct stream));
+  *out2 = malloc(sizeof(struct stream));
+  //if memory allocation failed, return with error
+  if(*out1 == 0 || *out2 == 0) {
+    return 1;
+  }
+
+  stream *work1 = *out1;
+  stream *work2 = *out2;
+  work1->has_reader = 0;
+  work2->has_reader = 0;
+  pipe_wrapper(work1->read_write);
+  pipe_wrapper(work2->read_write);
+
+  FILE *in_read_end = in->read_write[0];
+  FILE *out1_write_end = work1->read_write[1];
+  FILE *out2_write_end = work2->read_write[1];
+
+  if(fork() == 0) {
+    unsigned char c; 
+    while(fread(&c, sizeof(unsigned char), 1, in_read_end) == 1) {
+      assert(fwrite(&c, sizeof(unsigned char), 1, out1_write_end) == 1);
+      assert(fwrite(&c, sizeof(unsigned char), 1, out2_write_end) == 1);
+    }
+    fclose(in_read_end);
+    fclose(out1_write_end);
+    fclose(out2_write_end);
+    exit(0);
+  }
+
+  fclose(out1_write_end);
+  fclose(out2_write_end);
+  return 0;
 }
