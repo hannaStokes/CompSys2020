@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+
 struct stream {
   int has_reader;
   FILE *read_write[2];
@@ -116,7 +117,6 @@ int transducers_link_1(stream **out,
 
   fclose(out_write_end);
   return 0;
-
 }
 
 int transducers_link_2(stream **out,
@@ -155,7 +155,6 @@ int transducers_link_2(stream **out,
 
   fclose(out_write_end);
   return 0;
-
 }
 
 int transducers_dup(stream **out1, stream **out2,
