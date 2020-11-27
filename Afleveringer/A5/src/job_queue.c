@@ -14,6 +14,7 @@ int job_queue_init(struct job_queue *job_queue, int capacity) {
 }
 
 int job_queue_destroy(struct job_queue *job_queue) {
+  job_queue->destroyed = 1;
   while(1) {
     if(job_queue->in == job_queue->out) {
       

@@ -7,6 +7,7 @@ struct job_queue {
   int size;
   int in;
   int out;
+  int destroyed;
   void *jobs[];
 };
 
