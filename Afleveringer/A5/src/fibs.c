@@ -53,7 +53,6 @@ void fib_line(const char *line) {
 // pointer to a job queue.
 void* worker(void *arg) {
   struct job_queue *jq = arg;
-
   while (1) {
     char *line;
     if (job_queue_pop(jq, (void**)&line) == 0) {
@@ -97,7 +96,6 @@ int main(int argc, char * const *argv) {
       err(1, "pthread_create() failed");
     }
   }
-
 
   // Now read lines from stdin until EOF.
   char *line = NULL;

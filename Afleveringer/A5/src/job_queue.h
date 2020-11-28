@@ -4,14 +4,14 @@
 #include <pthread.h>
 
 struct job_queue {
-  int size;
-  int in;
-  int out;
-  int destroyed;
-  void **jobs;
-  pthread_cond_t empty; 
-  pthread_cond_t full;
-  pthread_mutex_t mutex;
+  int size; //Capacity of jobs
+  int in; //At which index in 'jobs' should the next job be pushed?
+  int out; //At which index in 'jobs' should the outgoing job be popped?
+  int destroyed; //Has the job_queue been destroyed
+  void **jobs; //Job array
+  pthread_cond_t pushed; //This condition is signaled when a job is pushed
+  pthread_cond_t popped; //This condition is signaled when a job is popped
+  pthread_mutex_t mutex; //The mutex used in the job_queue
 };
 
 // Initialise a job queue with the given capacity.  The queue starts out
