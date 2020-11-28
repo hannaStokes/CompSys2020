@@ -8,7 +8,10 @@ struct job_queue {
   int in;
   int out;
   int destroyed;
-  void *jobs[];
+  void **jobs;
+  pthread_cond_t empty; 
+  pthread_cond_t full;
+  pthread_mutex_t mutex;
 };
 
 // Initialise a job queue with the given capacity.  The queue starts out

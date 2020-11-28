@@ -86,7 +86,6 @@ int main(int argc, char * const *argv) {
       err(1, "invalid thread count: %s", argv[2]);
     }
   }
-
   // Create job queue.
   struct job_queue jq;
   job_queue_init(&jq, 64);
