@@ -19,6 +19,61 @@
 
 #include "job_queue.h"
 
+pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+struct grep_env {
+  const char *needle;
+  char *path;
+};
+
+int fauxgrep_file(char const *needle, char const *path) {
+  FILE *f = fopen(path, "r");
+
+  if (f == NULL) {
+    assert(pthread_mutex_lock(&stdout_mutex) == 0);
+    warn("failed to open %s", path);
+    assert(pthread_mutex_unlock(&stdout_mutex) == 0);
+    return -1;
+  }
+
+  char *line = NULL;
+  size_t linelen = 0;
+  int lineno = 1;
+
+  while (getline(&line, &linelen, f) != -1) {
+    if (strstr(line, needle) != NULL) {
+      assert(pthread_mutex_lock(&stdout_mutex) == 0);
+      printf("%s:%d: %s", path, lineno, line);
+      assert(pthread_mutex_unlock(&stdout_mutex) == 0);
+    }
+
+    lineno++;
+  }
+
+  free(line);
+  fclose(f);
+
+  return 0;
+}
+
+void* worker(void *arg) {
+  struct job_queue *jq = arg;
+  while (1) {
+    struct grep_env* env;
+    if (job_queue_pop(jq, (void**)&env) == 0) {
+      fauxgrep_file(env->needle,env->path);
+      free(env);
+    } else {
+      // If job_queue_pop() returned non-zero, that means the queue is
+      // being killed (or some other error occured).  In any case,
+      // that means it's time for this thread to die.
+      break;
+    }
+  }
+
+  return NULL;
+}
+
 int main(int argc, char * const *argv) {
   if (argc < 2) {
     err(1, "usage: [-n INT] STRING paths...");
@@ -50,9 +105,19 @@ int main(int argc, char * const *argv) {
     needle = argv[1];
     paths = &argv[2];
   }
+  
+  printf("start");
+  // Initialise the job queue and some worker threads here.
+  struct job_queue jq;
+  job_queue_init(&jq, 64);
 
-  assert(0); // Initialise the job queue and some worker threads here.
-
+  pthread_t *threads = calloc(num_threads, sizeof(pthread_t));
+  for (int i = 0; i < num_threads; i++) {
+    if (pthread_create(&threads[i], NULL, &worker, &jq) != 0) {
+      err(1, "pthread_create() failed");
+    }
+  }
+  
   // FTS_LOGICAL = follow symbolic links
   // FTS_NOCHDIR = do not change the working directory of the process
   //
@@ -65,14 +130,18 @@ int main(int argc, char * const *argv) {
     err(1, "fts_open() failed");
     return -1;
   }
+  printf("h");
 
   FTSENT *p;
   while ((p = fts_read(ftsp)) != NULL) {
+    struct grep_env *env = malloc(sizeof(struct grep_env));
     switch (p->fts_info) {
     case FTS_D:
       break;
     case FTS_F:
-      assert(0); // Process the file p->fts_path, somehow.
+      env->needle = needle;
+      env->path = strdup(p->fts_path);
+      job_queue_push(&jq, (void*)env);
       break;
     default:
       break;
@@ -81,7 +150,16 @@ int main(int argc, char * const *argv) {
 
   fts_close(ftsp);
 
-  assert(0); // Shut down the job queue and the worker threads here.
+  // Destroy the queue.
+  job_queue_destroy(&jq);
+
+  // Wait for all threads to finish.  This is important, at some may
+  // still be working on their job.
+  for (int i = 0; i < num_threads; i++) {
+    if (pthread_join(threads[i], NULL) != 0) {
+      err(1, "pthread_join() failed");
+    }
+  }
 
   return 0;
 }

@@ -17,6 +17,8 @@ test: $(TESTS)
 
 clean:
 	rm -rf $(TESTS) $(EXAMPLES) *.o core
+	rm -rf *.dSYM
+	rm -rf .vscode
 
 ../src.zip:
 	make clean
